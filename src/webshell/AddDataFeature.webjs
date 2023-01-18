@@ -1,0 +1,7 @@
+function AddDataFeature(context) {
+  context.onShellMessage('addData', props => {
+    if (window.uplot && window.uplot.setData && props) {
+      window.uplot.setData(props);
+    }
+  });
+}

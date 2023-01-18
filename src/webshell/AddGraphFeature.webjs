@@ -1,0 +1,70 @@
+function AddGraphFeature(context) {
+  context.onShellMessage('addGraph', props => {
+    window.padTo2Digits = num => {
+      return num.toString().padStart(2, '0');
+    };
+
+    window.convertMsToTime = milliseconds => {
+      let seconds = Math.floor(milliseconds / 1000);
+      let minutes = Math.floor(seconds / 60);
+      let hours = Math.floor(minutes / 60);
+
+      seconds = seconds % 60;
+      minutes = minutes % 60;
+
+      return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
+    };
+
+    window.uplot = new uPlot(
+      {
+        title: 'Throttle Position Chart',
+        width: 350,
+        height: 400,
+        series: [
+          {
+            label: 'Time',
+            value: (u, v) => convertMsToTime(v),
+          },
+          {
+            label: 'Throttle Position',
+            scale: '%',
+            value: (u, v) => v + '%',
+            stroke: 'red',
+          },
+          {
+            label: 'Engine Temperature',
+            scale: 'C',
+            value: (u, v) => v + 'C',
+            stroke: 'green',
+          },
+        ],
+        scales: {
+          x: { time: false },
+          '%': {
+            auto: false,
+            range: [0, 100],
+          },
+          'C': {
+            auto: false,
+            range: [10, 180],
+          },
+        },
+        axes: [
+          {
+            values: (u, vals) => vals.map(v => convertMsToTime(v)),
+          },
+          {
+            scale: '%',
+            values: (u, vals) => vals.map(v => v + '%'),
+          },
+          {
+            scale: 'C',
+            values: (u, vals) => vals.map(v => v + 'C'),
+          },
+        ],
+      },
+      props.data,
+      document.body,
+    );
+  });
+}
